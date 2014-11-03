@@ -16,18 +16,20 @@ var FONT_COLOUR = "#FFFF00";
 
 
 
+
 // Preload function
 function preload(): void {
     queue = new createjs.LoadQueue();
     queue.installPlugin(createjs.Sound);
     queue.addEventListener("complete", init);
     queue.loadManifest([
-        { id: "goku", src: "images/what.png" },
-        { id: "island", src: "images/island.png" },
-        { id: "cloud", src: "images/cloud.png" },
-        { id: "ocean", src: "images/ocean.gif" },
-        { id: "yay", src: "sounds/yay.ogg" },
-        { id: "thunder", src: "sounds/thunder.ogg" }
+        { id: "goku", src: "images/Goku.png" },
+        { id: "dragonBall", src: "images/DragonBall.png" },
+        { id: "bullet", src: "images/Bullet.png" },
+        { id: "sky", src: "images/Sky.jpg" },
+        { id: "yea", src: "sounds/Yea.mp3" },
+        { id: "grunt", src: "sounds/Goku Grunt.mp3" },
+        { id: "BG", src: "sounds/BG.mp3" }
     ]);
 }
 
@@ -37,16 +39,20 @@ function init(): void {
     createjs.Ticker.setFPS(60);
     createjs.Ticker.addEventListener("tick", gameLoop);
     gameStart();
+    
 }
 
 // Game Loop
 function gameLoop(event): void {
-    ocean.update();
-    island.update();
-    plane.update();
+
+    sky.update();
+    dragonBall.update();
+    goku.update();
 
     for (var count = 0; count < CLOUD_NUM; count++) {
-        clouds[count].update();
+
+            bullets[count].update();
+        
     }
 
     collisionCheck();
@@ -57,34 +63,36 @@ function gameLoop(event): void {
 }
 
 // Plane Class
-class Plane {
+class Goku {
     image: createjs.Bitmap;
     width: number;
     height: number;
     constructor() {
-        this.image = new createjs.Bitmap(queue.getResult("plane"));
+        createjs.Sound.play("BG");
+   
+        this.image = new createjs.Bitmap(queue.getResult("goku"));
         this.width = this.image.getBounds().width;
         this.height = this.image.getBounds().height;
-        this.image.regX = this.width * 0.5;
-        this.image.regY = this.height * 0.5;
-        this.image.y = 430;
-
+        this.image.regY = this.width * 0.5;
+        this.image.regX = this.height * 0.5;
+        this.image.x = 30;
+        
         stage.addChild(this.image);
     }
 
     update() {
-        this.image.x = stage.mouseX;
+        this.image.y = stage.mouseY;
     }
 }
 
 // Island Class
-class Island {
+class DragonBall {
     image: createjs.Bitmap;
     width: number;
     height: number;
     dy: number;
     constructor() {
-        this.image = new createjs.Bitmap(queue.getResult("island"));
+        this.image = new createjs.Bitmap(queue.getResult("dragonBall"));
         this.width = this.image.getBounds().width;
         this.height = this.image.getBounds().height;
         this.image.regX = this.width * 0.5;
@@ -95,13 +103,13 @@ class Island {
     }
 
     reset() {
-        this.image.y = -this.height;
-        this.image.x = Math.floor(Math.random() * stage.canvas.width);
+        this.image.x = 720;
+        this.image.y = Math.floor(Math.random() * stage.canvas.width);
     }
 
     update() {
-        this.image.y += this.dy;
-        if (this.image.y > (this.height + stage.canvas.height)) {
+        this.image.x -= this.dy;
+        if (this.image.x < (this.width - stage.canvas.width)) {
             this.reset();
         }
        
@@ -109,14 +117,14 @@ class Island {
 }
 
 // Island Class
-class Cloud {
+class Bullet {
     image: createjs.Bitmap;
     width: number;
     height: number;
     dy: number;
     dx: number;
     constructor() {
-        this.image = new createjs.Bitmap(queue.getResult("cloud"));
+        this.image = new createjs.Bitmap(queue.getResult("bullet"));
         this.width = this.image.getBounds().width;
         this.height = this.image.getBounds().height;
         this.image.regX = this.width * 0.5;
@@ -127,16 +135,16 @@ class Cloud {
     }
 
     reset() {
-        this.image.y = -this.height;
-        this.image.x = Math.floor(Math.random() * stage.canvas.width);
-        this.dy = Math.floor(Math.random() * 5 + 5);
-        this.dx = Math.floor(Math.random() * 4 - 2);
+        this.image.x = 900;
+        this.image.y = Math.floor(Math.random() * stage.canvas.width);
+        this.dx = Math.floor(Math.random() * 5 + 5);
+        this.dy = Math.floor(Math.random() * 4 - 2);
     }
 
     update() {
         this.image.y += this.dy;
-        this.image.x += this.dx;
-        if (this.image.y > (this.height + stage.canvas.height)) {
+        this.image.x -= this.dx;
+        if (this.image.x < (this.width - stage.canvas.width)) {
             this.reset();
         }
 
@@ -144,13 +152,13 @@ class Cloud {
 }
 
 // Ocean Class
-class Ocean {
+class Sky {
     image: createjs.Bitmap;
     width: number;
     height: number;
     dy: number;
     constructor() {
-        this.image = new createjs.Bitmap(queue.getResult("ocean"));
+        this.image = new createjs.Bitmap(queue.getResult("sky"));
         this.width = this.image.getBounds().width;
         this.height = this.image.getBounds().height;
         this.dy = 5;
@@ -189,7 +197,7 @@ class Scoreboard {
     }
 
     update() {
-        this.labelString = "Lives: " + this.lives.toString() + " Score: " + this.score.toString(); 
+        this.labelString = "Lives: " + this.lives.toString() + " Dragon Balls: " + this.score.toString(); 
         this.label.text = this.labelString;
     }
 }
@@ -221,58 +229,76 @@ function distance(point1: createjs.Point, point2: createjs.Point):number {
 }
 
 // Check Collision with Plane and Island
-function planeAndIsland() {
+function gokuAndDragonBall() {
     var p1: createjs.Point = new createjs.Point();
     var p2: createjs.Point = new createjs.Point();
 
-    p1.x = plane.image.x;
-    p1.y = plane.image.y;
-    p2.x = island.image.x;
-    p2.y = island.image.y;
+    p1.x = goku.image.x;
+    p1.y = goku.image.y;
+    p2.x = dragonBall.image.x;
+    p2.y = dragonBall.image.y;
 
-    if (distance(p1, p2) <= ((plane.height * 0.5) + (island.height * 0.5))) {
-        createjs.Sound.play("yay");
+    if (distance(p1, p2) <= ((goku.height * 0.5) + (goku.height * 0.5))) {
+        createjs.Sound.play("yea");
         scoreboard.score += 100;
-        island.reset();
+        dragonBall.reset();
     }
 }
 
 // Check Collision with Plane and Cloud
-function planeAndCloud(theCloud: Cloud) {
+function gokuAndBullet(theBullet: Bullet) {
     var p1: createjs.Point = new createjs.Point();
     var p2: createjs.Point = new createjs.Point();
-    var cloud: Cloud = new Cloud();
+    var bullet: Bullet = new Bullet();
 
-    cloud = theCloud;
+    bullet = theBullet;
 
-    p1.x = plane.image.x;
-    p1.y = plane.image.y;
-    p2.x = cloud.image.x;
-    p2.y = cloud.image.y;
+    p1.x = goku.image.x;
+    p1.y = goku.image.y;
+    p2.x = bullet.image.x;
+    p2.y = bullet.image.y;
 
-    if (distance(p1, p2) <= ((plane.height * 0.5) + (cloud.height * 0.5))) {
-        createjs.Sound.play("thunder");
+    if (distance(p1, p2) <= ((goku.height * 0.5) + (goku.height * 0.5))) {
+        createjs.Sound.play("grunt");
         scoreboard.lives -= 1;
-        cloud.reset();
+        if (scoreboard.lives == 0) {
+            //GO TO GAME OVER
+            console.log("YOU LOSE");
+            gameOver();
+        }
+        bullet.reset();
     }
 }
 
 function collisionCheck() {
-    planeAndIsland();
+    gokuAndDragonBall();
 
     for (var count = 0; count < CLOUD_NUM; count++) {
-        planeAndCloud(clouds[count]);
+        gokuAndBullet(bullets[count]);
     }
 }
 
 function gameStart(): void {
-    ocean = new Ocean();
-    island = new Island();
-    plane = new Plane();
+    sky = new Sky();
+    dragonBall = new DragonBall();
+    goku = new Goku();
 
     for (var count = 0; count < CLOUD_NUM; count++) {
-        clouds[count] = new Cloud();
+        bullets[count] = new Bullet();
     }
-
+    
     scoreboard = new Scoreboard(); 
+    
+}
+function gameOver(): void {
+    stage.removeAllChildren();
+    sky = new Sky();
+    label: createjs.Text;
+ 
+    var label = new createjs.Text("YOU LOSE", GAME_FONT, FONT_COLOUR);
+    this.update();
+    label.x = 350;
+    label.y = 200;
+    stage.addChild(this.label);
+    stage.update;
 }
