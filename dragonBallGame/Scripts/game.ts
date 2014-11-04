@@ -37,6 +37,7 @@ function init(): void {
     stage.enableMouseOver(20);
     createjs.Ticker.setFPS(60);
     createjs.Ticker.addEventListener("tick", gameLoop);
+    loading();
     gameStart();
     
 }
@@ -51,6 +52,15 @@ function gameLoop(event): void {
     collisionCheck();
     scoreboard.update();
     stage.update();
+}
+
+function loading(): void {
+    var load = 0;
+    var labelString: string = load.toString();
+    this.label = new createjs.Text(this.labelString, GAME_FONT, FONT_COLOUR);
+    setTimeout(function () {
+        stage.update();
+    }, 400);
 }
 
 // Plane Class
@@ -123,7 +133,7 @@ class Bullet {
     }
 
     reset() {
-        this.image.x = 800;
+        this.image.x = 600;
         this.image.y = Math.floor(Math.random() * stage.canvas.width);
         this.dx = Math.floor(Math.random() * 5 + 5);
         this.dy = Math.floor(Math.random() * 4 - 2);
@@ -238,14 +248,10 @@ function gokuAndDragonBall() {
 function gokuAndBullet(theBullet: Bullet) {
     var p1: createjs.Point = new createjs.Point();
     var p2: createjs.Point = new createjs.Point();
-    var bullet: Bullet = new Bullet();
-
-    bullet = theBullet;
-
     p1.x = goku.image.x;
     p1.y = goku.image.y;
-    p2.x = bullet.image.x;
-    p2.y = bullet.image.y;
+    p2.x = theBullet.image.x;
+    p2.y = theBullet.image.y;
 
     if (distance(p1, p2) <= ((goku.height * 0.5) + (goku.height * 0.5))) {
         createjs.Sound.play("grunt");
@@ -255,7 +261,7 @@ function gokuAndBullet(theBullet: Bullet) {
             console.log("YOU LOSE");
             gameOver();
         }
-        bullet.reset();
+        theBullet.reset();
     }
 }
 
