@@ -8,11 +8,14 @@ var bullets = [];
 var sky;
 var scoreboard;
 
+//New
 // game constants
-var CLOUD_NUM = 3;
+var CLOUD_NUM = 7;
 var PLAYER_LIVES = 5;
 var GAME_FONT = "40px Consolas";
 var FONT_COLOUR = "#FFFF00";
+var startUN = new createjs.Bitmap("images/startUN.png");
+var startPU = new createjs.Bitmap("images/startPU.png");
 
 // Preload function
 function preload() {
@@ -23,7 +26,7 @@ function preload() {
         { id: "goku", src: "images/Goku.png" },
         { id: "dragonBall", src: "images/DragonBall.png" },
         { id: "bullet", src: "images/Bullet.png" },
-        { id: "sky", src: "images/Sky.jpg" },
+        { id: "sky", src: "images/Sky2.jpg" },
         { id: "yea", src: "sounds/Yea.mp3" },
         { id: "grunt", src: "sounds/Goku Grunt.mp3" },
         { id: "BG", src: "sounds/BG.mp3" }
@@ -32,6 +35,7 @@ function preload() {
 
 function init() {
     stage = new createjs.Stage(document.getElementById("canvas"));
+    createjs.Sound.play("BG");
     stage.enableMouseOver(20);
     createjs.Ticker.setFPS(60);
     createjs.Ticker.addEventListener("tick", gameLoop);
@@ -43,15 +47,11 @@ function gameLoop(event) {
     sky.update();
     dragonBall.update();
     goku.update();
-
     for (var count = 0; count < CLOUD_NUM; count++) {
         bullets[count].update();
     }
-
     collisionCheck();
-
     scoreboard.update();
-
     stage.update();
 }
 
@@ -59,14 +59,12 @@ function gameLoop(event) {
 var Goku = (function () {
     function Goku() {
         createjs.Sound.play("BG");
-
         this.image = new createjs.Bitmap(queue.getResult("goku"));
         this.width = this.image.getBounds().width;
         this.height = this.image.getBounds().height;
         this.image.regY = this.width * 0.5;
         this.image.regX = this.height * 0.5;
         this.image.x = 30;
-
         stage.addChild(this.image);
     }
     Goku.prototype.update = function () {
@@ -88,7 +86,7 @@ var DragonBall = (function () {
         this.reset();
     }
     DragonBall.prototype.reset = function () {
-        this.image.x = 720;
+        this.image.x = 620;
         this.image.y = Math.floor(Math.random() * stage.canvas.width);
     };
 
@@ -114,7 +112,7 @@ var Bullet = (function () {
         this.reset();
     }
     Bullet.prototype.reset = function () {
-        this.image.x = 900;
+        this.image.x = 800;
         this.image.y = Math.floor(Math.random() * stage.canvas.width);
         this.dx = Math.floor(Math.random() * 5 + 5);
         this.dy = Math.floor(Math.random() * 4 - 2);
@@ -136,17 +134,17 @@ var Sky = (function () {
         this.image = new createjs.Bitmap(queue.getResult("sky"));
         this.width = this.image.getBounds().width;
         this.height = this.image.getBounds().height;
-        this.dy = 5;
+        this.dx = 5;
         stage.addChild(this.image);
         this.reset();
     }
     Sky.prototype.reset = function () {
-        this.image.y = -this.height + stage.canvas.height;
+        this.image.x = -this.width + stage.canvas.width;
     };
 
     Sky.prototype.update = function () {
-        this.image.y += this.dy;
-        if (this.image.y >= 0) {
+        this.image.x += this.dx;
+        if (this.image.x >= 0) {
             this.reset();
         }
     };
@@ -167,7 +165,7 @@ var Scoreboard = (function () {
         stage.addChild(this.label);
     }
     Scoreboard.prototype.update = function () {
-        this.labelString = "Lives: " + this.lives.toString() + " Dragon Balls: " + this.score.toString();
+        this.labelString = "Lives: " + this.lives.toString() + " D Balls: " + this.score.toString();
         this.label.text = this.labelString;
     };
     return Scoreboard;
@@ -211,7 +209,7 @@ function gokuAndDragonBall() {
 
     if (distance(p1, p2) <= ((goku.height * 0.5) + (goku.height * 0.5))) {
         createjs.Sound.play("yea");
-        scoreboard.score += 100;
+        scoreboard.score += 1;
         dragonBall.reset();
     }
 }
@@ -260,17 +258,20 @@ function gameStart() {
 
     scoreboard = new Scoreboard();
 }
+
 function gameOver() {
     stage.removeAllChildren();
     sky = new Sky();
     label:
     createjs.Text;
-
-    var label = new createjs.Text("YOU LOSE", GAME_FONT, FONT_COLOUR);
+    var label = new createjs.Text("Hello", GAME_FONT, FONT_COLOUR);
     this.update();
+    stage.addChild(label);
     label.x = 350;
     label.y = 200;
-    stage.addChild(this.label);
-    stage.update;
+    stage.addChild(startUN);
+    startUN.x = 350;
+    startUN.y = 350;
+    stage.update();
 }
 //# sourceMappingURL=game.js.map

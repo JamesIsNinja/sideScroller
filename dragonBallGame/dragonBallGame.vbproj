@@ -90,6 +90,9 @@
     <Content Include="images\DragonBall.png" />
     <Content Include="images\Goku.png" />
     <Content Include="images\Sky.jpg" />
+    <Content Include="images\Sky2.jpg" />
+    <Content Include="images\startPU.png" />
+    <Content Include="images\startUN.png" />
     <Content Include="index.html" />
     <Content Include="Scripts\filters\AlphaMapFilter.js" />
     <Content Include="Scripts\filters\AlphaMaskFilter.js" />
